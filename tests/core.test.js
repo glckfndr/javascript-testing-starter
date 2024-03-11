@@ -1,5 +1,5 @@
 import { it, expect, describe } from "vitest";
-import { calculateDiscount, getCoupons } from "../src/core";
+import { calculateDiscount, getCoupons, validateUserInput } from "../src/core";
 
 describe("getCoupons", () => {
   const coupons = getCoupons();
@@ -36,7 +36,7 @@ describe("calculateDiscount", () => {
   it("should handle wrong price", () => {
     let discount = calculateDiscount(-1, "SAVE10");
     expect(discount).toMatch(/invalid/i);
-    discount = calculateDiscount('10', "SAVE10");
+    discount = calculateDiscount("10", "SAVE10");
     expect(discount).toMatch(/invalid/i);
   });
 
@@ -48,5 +48,54 @@ describe("calculateDiscount", () => {
   it("should handle when code is wrong", () => {
     let discount = calculateDiscount(10, "SAVE1");
     expect(discount).toEqual(10);
+  });
+});
+
+describe("validateUserInput", () => {
+  const minAge = 18;
+  const minLength = 3;
+  const maxAge = 100;
+  const maxLength = 255;
+  const userName = "glc";
+
+  it("should pass validation if username and age are valid ", () => {
+    const validation = validateUserInput(userName, minAge);
+    expect(validation).toMatch(/success/i);
+  });
+
+  it("should not pass validation if username length less than minLength", () => {
+    const validation = validateUserInput(userName.substring(0, minLength - 1), minAge);
+    expect(validation).toMatch(/Invalid username/i);
+  });
+
+  it("should not pass validation if username length greater than maxLength", () => {
+    const validation = validateUserInput('a'.repeat(maxLength + 1), maxAge);
+    expect(validation).toMatch(/Invalid username/i);
+  });
+
+  it("should not pass validation if username is not string", () => {
+    const validation = validateUserInput(111, minAge);
+    expect(validation).toMatch(/Invalid username/i);
+  });
+
+  it("should not pass validation if age less than minAge", () => {
+    const validation = validateUserInput(userName, minAge - 1);
+    expect(validation).toMatch(/Invalid age/i);
+  });
+
+  it("should not pass validation if age greater than maxAge", () => {
+    const validation = validateUserInput(userName, maxAge + 1);
+    expect(validation).toMatch(/Invalid age/i);
+  });
+
+  it("should not pass validation if age less is not number", () => {
+    const validation = validateUserInput(userName, '18');
+    expect(validation).toMatch(/Invalid age/i);
+  });
+
+  it("should not pass validation if user name and age is not valid ", () => {
+    const validation = validateUserInput(1, '18');
+    expect(validation).toMatch(/Invalid age/i);
+    expect(validation).toMatch(/Invalid username/i);
   });
 });

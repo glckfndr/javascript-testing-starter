@@ -29,16 +29,20 @@ export function calculateDiscount(price, discountCode) {
 // Exercise: Positive and negative testing
 export function validateUserInput(username, age) {
   let errors = [];
+  const minAge = 18;
+  const minLength = 3;
+  const maxAge = 100;
+  const maxLength = 255;
 
-  if (typeof username !== 'string' || username.length < 3) {
+  if (typeof username !== 'string' || username.length < minLength || username.length > maxLength) {
     errors.push('Invalid username');
   }
 
-  if (typeof age !== 'number' || age < 18) {
+  if (typeof age !== 'number' || age < minAge || age > maxAge) {
     errors.push('Invalid age');
   }
 
-  return errors.length === 0 ? 'Validation successful' : errors.join(', ');
+  return errors.length == 0 ? 'Validation successful' : errors.join(', ');
 }
 
 // Lesson: Boundary testing
