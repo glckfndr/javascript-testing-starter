@@ -1,5 +1,5 @@
 import { it, expect, describe } from "vitest";
-import { calculateDiscount, getCoupons, validateUserInput } from "../src/core";
+import { calculateDiscount, getCoupons, validateUserInput, isPriceInRange, isValidUsername} from "../src/core";
 
 describe("getCoupons", () => {
   const coupons = getCoupons();
@@ -99,3 +99,49 @@ describe("validateUserInput", () => {
     expect(validation).toMatch(/Invalid username/i);
   });
 });
+
+describe('isPriceInRange', () => {
+  const minPrice = 0.0;
+  const maxPrice = 100.0;
+  it('should return true if price is on the boundary', () => {
+    expect(isPriceInRange(maxPrice, minPrice, maxPrice)).toBeTruthy();
+    expect(isPriceInRange(minPrice, minPrice, maxPrice)).toBeTruthy();
+  })
+
+  it('should return true if price is in the range', () => {
+    expect(isPriceInRange(maxPrice - 0.1, minPrice, maxPrice)).toBeTruthy();
+    expect(isPriceInRange(minPrice + 0.1, minPrice, maxPrice)).toBeTruthy();
+  })
+
+  it('should return false if price is out of the range', () => {
+    expect(isPriceInRange(maxPrice + 0.1, minPrice, maxPrice)).toBeFalsy();
+    expect(isPriceInRange(minPrice - 0.1, minPrice, maxPrice)).toBeFalsy();
+  })
+})
+
+describe('isValidUsername', () => {
+  const minLength = 5;
+  const maxLength = 15;
+  const username = 'a'
+
+  it('should return true if username has min or max length', () => {
+    expect(isValidUsername(username.repeat(minLength))).toBeTruthy();
+    expect(isValidUsername(username.repeat(maxLength))).toBeTruthy();
+  })
+
+  it('should return true if username between min or max length', () => {
+    expect(isValidUsername(username.repeat(minLength + 1))).toBeTruthy();
+    expect(isValidUsername(username.repeat(maxLength -1))).toBeTruthy();
+  })
+
+  it('should return false if username is beyond min or max length', () => {
+    expect(isValidUsername(username.repeat(minLength - 1))).toBeFalsy();
+    expect(isValidUsername(username.repeat(maxLength + 1))).toBeFalsy();
+  })
+
+  it('should return false if username is invalid input time', () => {
+    expect(isValidUsername(null)).toBeFalsy();
+    expect(isValidUsername(undefined)).toBeFalsy();
+    expect(isValidUsername(1)).toBeFalsy();
+  })
+})
