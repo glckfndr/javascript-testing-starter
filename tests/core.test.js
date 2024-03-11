@@ -1,4 +1,4 @@
-import { it, expect, describe } from "vitest";
+import { it, expect, describe, beforeEach } from "vitest";
 import {
   calculateDiscount,
   getCoupons,
@@ -7,6 +7,7 @@ import {
   isValidUsername,
   canDrive,
   fetchData,
+  Stack,
 } from "../src/core";
 
 describe("getCoupons", () => {
@@ -219,10 +220,65 @@ describe("fetchData", () => {
   });
 
   it("should return error with then", async () => {
-     const prom = fetchData(false)
-     await prom.then((arr) => {
-      expect(Array.isArray(arr)).toBe(true);
-      expect(arr.length).greaterThan(0);
-    }).catch(error => expect(error).toMatch(/Error/i));
+    const prom = fetchData(false);
+    await prom
+      .then((arr) => {
+        expect(Array.isArray(arr)).toBe(true);
+        expect(arr.length).greaterThan(0);
+      })
+      .catch((error) => expect(error).toMatch(/Error/i));
+  });
+});
+
+describe("Stack", () => {
+  let emptyStack;
+  beforeEach(() => (emptyStack = new Stack()));
+
+  const twoElementStack = new Stack();
+  twoElementStack.push(11);
+  twoElementStack.push(12);
+
+  it("isEmpty should return true if stack is empty", () => {
+    expect(emptyStack.isEmpty()).toEqual(true);
+    expect(emptyStack.size()).toEqual(0);
+  });
+
+  it("push should put element into the stack", () => {
+    emptyStack.push(10);
+    expect(emptyStack.size()).toEqual(1);
+  });
+
+  it("isEmpty should return false if stack is not empty", () => {
+    emptyStack.push(10);
+    expect(emptyStack.isEmpty()).toEqual(false);
+  });
+
+  it("pop should throw error when stack is empty", () => {
+    {
+      expect(() => emptyStack.pop()).toThrowError(/empty/i);
+    }
+  });
+
+  it("peek should throw error when stack is empty", () => {
+    expect(() => emptyStack.peek()).toMatch(/empty/i);
+  });
+
+  it("size should return number of elements", () => {
+    expect(twoElementStack.size()).toEqual(2);
+  });
+
+  it("peek should return element on the top without removing it", () => {
+    expect(twoElementStack.peek()).toEqual(12);
+    expect(twoElementStack.size()).toEqual(2);
+  });
+
+  it("pop should return element on the top and remove it", () => {
+    expect(twoElementStack.pop()).toEqual(12);
+    expect(twoElementStack.size()).toEqual(1);
+  });
+
+  it("clear should remove all elements", () => {
+    twoElementStack.clear();
+    expect(twoElementStack.size()).toEqual(0);
   });
 });
