@@ -114,17 +114,18 @@ describe("isPriceInRange", () => {
   const minPrice = 0.0;
   const maxPrice = 100.0;
   const testData = [
-    { price: maxPrice, min: minPrice, max: maxPrice, expected: true },
-    { price: minPrice, min: minPrice, max: maxPrice, expected: true },
-    { price: maxPrice - 0.1, min: minPrice, max: maxPrice, expected: true },
-    { price: minPrice + 0.1, min: minPrice, max: maxPrice, expected: true },
-    { price: maxPrice + 0.1, min: minPrice, max: maxPrice, expected: false },
-    { price: minPrice - 0.1, min: minPrice, max: maxPrice, expected: false },
+    { scenario: 'price == max', price: maxPrice, expected: true },
+    { scenario: 'price == min', price: minPrice,  expected: true },
+    { scenario: 'price < max', price: maxPrice - 0.1, expected: true },
+    { scenario: 'price > min', price: minPrice + 0.1, expected: true },
+    { scenario: 'price > max', price: maxPrice + 0.1, expected: false },
+    { scenario: 'price < min', price: minPrice - 0.1, expected: false },
   ];
+
   it.each(testData)(
-    "should return $actual for price: $price, min: $min, max: $max",
-    ({ price, min, max, expected }) => {
-      expect(isPriceInRange(price, min, max)).toBe(expected);
+    "should return $expected for $scenario",
+    ({ price, expected }) => {
+      expect(isPriceInRange(price, minPrice, maxPrice)).toBe(expected);
     }
   );
 });
