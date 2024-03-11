@@ -6,6 +6,7 @@ import {
   isPriceInRange,
   isValidUsername,
   canDrive,
+  fetchData,
 } from "../src/core";
 
 describe("getCoupons", () => {
@@ -114,12 +115,12 @@ describe("isPriceInRange", () => {
   const minPrice = 0.0;
   const maxPrice = 100.0;
   const testData = [
-    { scenario: 'price == max', price: maxPrice, expected: true },
-    { scenario: 'price == min', price: minPrice,  expected: true },
-    { scenario: 'price < max', price: maxPrice - 0.1, expected: true },
-    { scenario: 'price > min', price: minPrice + 0.1, expected: true },
-    { scenario: 'price > max', price: maxPrice + 0.1, expected: false },
-    { scenario: 'price < min', price: minPrice - 0.1, expected: false },
+    { scenario: "price == max", price: maxPrice, expected: true },
+    { scenario: "price == min", price: minPrice, expected: true },
+    { scenario: "price < max", price: maxPrice - 0.1, expected: true },
+    { scenario: "price > min", price: minPrice + 0.1, expected: true },
+    { scenario: "price > max", price: maxPrice + 0.1, expected: false },
+    { scenario: "price < min", price: minPrice - 0.1, expected: false },
   ];
 
   it.each(testData)(
@@ -192,5 +193,36 @@ describe("canDrive", () => {
 
   it("should return error if countryCode is invalid", () => {
     expect(canDrive(maxAge, "US1")).toMatch(/Invalid/i);
+  });
+});
+
+describe("fetchData", () => {
+  it("should return array", async () => {
+    let received = await fetchData();
+    expect(Array.isArray(received)).toBe(true);
+    expect(received.length).greaterThan(0);
+  });
+
+  it("should return array with then", async () => {
+    await fetchData().then((arr) => {
+      expect(Array.isArray(arr)).toBe(true);
+      expect(arr.length).greaterThan(0);
+    });
+  });
+
+  it("should return error", async () => {
+    try {
+      await fetchData(false);
+    } catch (error) {
+      expect(error).toMatch(/Error/i);
+    }
+  });
+
+  it("should return error with then", async () => {
+     const prom = fetchData(false)
+     await prom.then((arr) => {
+      expect(Array.isArray(arr)).toBe(true);
+      expect(arr.length).greaterThan(0);
+    }).catch(error => expect(error).toMatch(/Error/i));
   });
 });

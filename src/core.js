@@ -75,16 +75,24 @@ export function canDrive(age, countryCode) {
     return "Invalid country code";
   }
 
-  return typeof age === "number" && age >= legalDrivingAge[countryCode] && age <= maxAge;
+  return (
+    typeof age === "number" &&
+    age >= legalDrivingAge[countryCode] &&
+    age <= maxAge
+  );
 }
 
 // Lesson: Testing asynchronous code
-export function fetchData() {
-  return new Promise((resolve) => {
+export function fetchData(isSuccess = true) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       const data = [1, 2, 3];
-      resolve(data);
-    });
+      if (isSuccess) {
+        resolve(data);
+      } else {
+        reject("Got error!");
+      }
+    }, 200);
   });
 }
 
