@@ -113,20 +113,20 @@ describe("validateUserInput", () => {
 describe("isPriceInRange", () => {
   const minPrice = 0.0;
   const maxPrice = 100.0;
-  it("should return true if price is on the boundary", () => {
-    expect(isPriceInRange(maxPrice, minPrice, maxPrice)).toBeTruthy();
-    expect(isPriceInRange(minPrice, minPrice, maxPrice)).toBeTruthy();
-  });
-
-  it("should return true if price is in the range", () => {
-    expect(isPriceInRange(maxPrice - 0.1, minPrice, maxPrice)).toBeTruthy();
-    expect(isPriceInRange(minPrice + 0.1, minPrice, maxPrice)).toBeTruthy();
-  });
-
-  it("should return false if price is out of the range", () => {
-    expect(isPriceInRange(maxPrice + 0.1, minPrice, maxPrice)).toBeFalsy();
-    expect(isPriceInRange(minPrice - 0.1, minPrice, maxPrice)).toBeFalsy();
-  });
+  const testData = [
+    { price: maxPrice, min: minPrice, max: maxPrice, expected: true },
+    { price: minPrice, min: minPrice, max: maxPrice, expected: true },
+    { price: maxPrice - 0.1, min: minPrice, max: maxPrice, expected: true },
+    { price: minPrice + 0.1, min: minPrice, max: maxPrice, expected: true },
+    { price: maxPrice + 0.1, min: minPrice, max: maxPrice, expected: false },
+    { price: minPrice - 0.1, min: minPrice, max: maxPrice, expected: false },
+  ];
+  it.each(testData)(
+    "should return $actual for price: $price, min: $min, max: $max",
+    ({ price, min, max, expected }) => {
+      expect(isPriceInRange(price, min, max)).toBe(expected);
+    }
+  );
 });
 
 describe("isValidUsername", () => {
