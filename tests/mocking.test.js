@@ -6,12 +6,14 @@ import {
   renderPage,
   submitOrder,
   signUp,
+  login,
 } from "../src/mocking";
 import { getExchangeRate } from "../src/libs/currency";
 import { getShippingQuote } from "../src/libs/shipping";
 import { trackPageView } from "../src/libs/analytics";
 import { charge } from "../src/libs/payment";
 import { sendEmail } from "../src/libs/email";
+import security from "../src/libs/security";
 
 vi.mock("../src/libs/currency.js");
 vi.mock("../src/libs/shipping");
@@ -117,5 +119,17 @@ describe("signUp", () => {
     expect(calls[0]).toEqual(validEmail);
     expect(calls[1]).toMatch(/welcome/i);
     expect(sendEmail).toBeCalled();
+  });
+});
+
+describe("login", () => {
+  it("should email the one-time login code", async () => {
+    const validEmail = "toot@gmail.com";
+    const spy = vi.spyOn(security, "generateCode");
+
+    await login(validEmail);
+
+    const code = spy.mock.results[0].value;
+    expect(sendEmail).toBeCalledWith(validEmail, code.toString());
   });
 });
