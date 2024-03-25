@@ -1,5 +1,5 @@
 import { send } from "vite";
-import { it, expect, describe, vi } from "vitest";
+import { it, expect, describe, vi, beforeEach } from "vitest";
 import {
   getPriceInCurrency,
   getShippingInfo,
@@ -7,6 +7,8 @@ import {
   submitOrder,
   signUp,
   login,
+  isOnline,
+  getDiscount,
 } from "../src/mocking";
 import { getExchangeRate } from "../src/libs/currency";
 import { getShippingQuote } from "../src/libs/shipping";
@@ -101,6 +103,11 @@ describe("submitOrder", () => {
 
 describe("signUp", () => {
   const validEmail = "toot@gmail.com";
+  beforeEach(() => {
+    //vi.mocked(sendEmail).mockClear();
+    // vi.clearAllMocks();
+  });
+
   it("should return false if email is not valid", async () => {
     const invalidEmail = "toot!gmail.com";
 
@@ -115,6 +122,8 @@ describe("signUp", () => {
 
   it("should send email if email valid", async () => {
     await signUp(validEmail);
+
+    expect(sendEmail).toHaveBeenCalledOnce();
     const calls = vi.mocked(sendEmail).mock.calls[0];
     expect(calls[0]).toEqual(validEmail);
     expect(calls[1]).toMatch(/welcome/i);
@@ -131,5 +140,43 @@ describe("login", () => {
 
     const code = spy.mock.results[0].value;
     expect(sendEmail).toBeCalledWith(validEmail, code.toString());
+  });
+});
+
+describe("isOnline", () => {
+  it("should should return false if current hour is outside opening hours", () => {
+    vi.setSystemTime("2024-01-01 7:49");
+    expect(isOnline()).toBe(false);
+
+    vi.setSystemTime("2024-01-01 20:00");
+    expect(isOnline()).toBe(false);
+  });
+
+  it("should should return true if current hour is within opening hours", () => {
+    vi.setSystemTime("2024-01-01 8:00");
+    expect(isOnline()).toBe(true);
+
+    vi.setSystemTime("2024-01-01 19:59");
+    expect(isOnline()).toBe(true);
+  });
+});
+
+describe("getDiscount", () => {
+  it("should return discount 0.2 on Christmas day", () => {
+    vi.setSystemTime("2023-12-25 00:01");
+    expect(getDiscount()).toEqual(0.2);
+
+    vi.setSystemTime("2023-12-25 23:59");
+    expect(getDiscount()).toEqual(0.2);
+  });
+
+  it("should return discount 0 on any other day", () => {
+    vi.setSystemTime("2023-12-24 23:59");
+    expect(getDiscount()).toEqual(0);
+  });
+
+  it("should return discount 0 on any other day", () => {
+    vi.setSystemTime("2023-12-26 00:01");
+    expect(getDiscount()).toEqual(0);
   });
 });
